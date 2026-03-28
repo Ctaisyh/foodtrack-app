@@ -5,6 +5,287 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FoodTrack – Add Food</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .step.active .step-circle  { background: var(--nav-bg); border-color: var(--nav-bg); color: #fff; }
+    .step.done .step-circle    { background: var(--green);  border-color: var(--green);  color: #fff; }
+
+    .step-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .step.active .step-label { color: var(--nav-bg); font-weight: 600; }
+    .step.done .step-label   { color: var(--green); }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 8px;
+      margin-bottom: 22px;
+      transition: background 0.3s;
+      min-width: 40px;
+    }
+
+    .step-line.done { background: var(--green); }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafbfa;
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--green);
+      background: var(--green-light);
+    }
+
+    .upload-zone .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .upload-zone p { color: var(--muted); font-size: 0.9rem; }
+    .upload-zone p strong { color: var(--green); }
+    .upload-zone .file-types { font-size: 0.75rem; color: var(--muted); margin-top: 6px; opacity: 0.7; }
+
+    #file-input { display: none; }
+
+    #preview-container {
+      display: none;
+      margin-top: 14px;
+      position: relative;
+    }
+
+    #preview-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .preview-change {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    /* SCAN BUTTON */
+    .btn-scan {
+      width: 100%;
+      background: var(--nav-bg);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-scan:hover    { background: #253d2a; }
+    .btn-scan:disabled { background: #b0b8ad; cursor: not-allowed; }
+
+    /* SCANNING ANIMATION */
+    .scan-loader {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULT BOX */
+    #result-box {
+      display: none;
+      margin-top: 1.2rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .result-header {
+      background: var(--green);
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-body {
+      background: var(--green-light);
+      border: 1px solid #a8dfc5;
+      border-top: none;
+      padding: 1rem 1.2rem;
+    }
+
+    .result-food-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0e7a50;
+    }
+
+    .result-confidence {
+      font-size: 0.8rem;
+      color: var(--green);
+      margin-top: 2px;
+    }
+
+    /* MANUAL FORM */
+    #manual-form {
+      display: none;
+      margin-top: 1.2rem;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--card);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus { border-color: var(--green); }
+
+    .btn-save {
+      width: 100%;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-save:hover { background: #0e7a50; }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--nav-bg);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    .divider {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+  </style>
 </head>
 <body>
 
@@ -14,10 +295,27 @@
     <a href="index.html" class="nav-btn">← Dashboard</a>
   </nav>
 
-  <!-- MAIN CONTENT -->
   <div class="add-food-wrapper">
 
     <a href="index.html" class="back-link">← Back to Dashboard</a>
+
+    <!-- Step Progress Bar -->
+    <div class="steps-bar">
+      <div class="step active" id="step1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Upload Image</div>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step" id="step2">
+        <div class="step-circle">2</div>
+        <div class="step-label">AI Detection</div>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step" id="step3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Save Food</div>
+      </div>
+    </div>
 
     <div class="page-header">
       <h1>Scan Your Food</h1>
@@ -31,60 +329,96 @@
         <div class="icon">📷</div>
         <p><strong>Click to upload</strong> a food image</p>
         <p>or drag and drop here</p>
-        <img id="preview-img" src="" alt="Preview" />
+        <p class="file-types">Supports JPG, PNG, WEBP</p>
+        <div id="preview-container">
+          <img id="preview-img" src="" alt="Preview" />
+          <button class="preview-change" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Change</button>
+        </div>
       </div>
       <input type="file" id="file-input" accept="image/*" />
 
-      <!-- Result Box (shown after detection) -->
-      <div id="result-box">
-        <div class="result-label">Detected Food</div>
-        <div class="result-value" id="result-value">Apple 🍎</div>
-      </div>
-
       <!-- Scan Button -->
       <button class="btn-scan" id="scan-btn" disabled onclick="scanFood()">
-        Scan Food
+        <span id="scan-label">🔍 Scan Food</span>
+        <div class="scan-loader" id="scan-loader"></div>
       </button>
+
+      <!-- Result Box -->
+      <div id="result-box">
+        <div class="result-header">✅ Food Detected!</div>
+        <div class="result-body">
+          <div class="result-food-name" id="result-food-name">Apple 🍎</div>
+          <div class="result-confidence" id="result-confidence">Confidence: 94%</div>
+        </div>
+      </div>
+
+      <div class="divider" id="manual-divider" style="display:none">or edit manually</div>
+
+      <!-- Manual Save Form -->
+      <div id="manual-form">
+        <div class="form-group">
+          <label>Food Name</label>
+          <input type="text" id="input-food-name" placeholder="e.g. Apple" />
+        </div>
+        <div class="form-group">
+          <label>Date Added</label>
+          <input type="date" id="input-date-added" />
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="input-expiry-date" />
+        </div>
+        <button class="btn-save" onclick="saveFood()">💾 Save to Dashboard</button>
+      </div>
 
     </div>
   </div>
 
-  <script>
-    const fileInput   = document.getElementById('file-input');
-    const uploadZone  = document.getElementById('upload-zone');
-    const previewImg  = document.getElementById('preview-img');
-    const scanBtn     = document.getElementById('scan-btn');
-    const resultBox   = document.getElementById('result-box');
-    const resultValue = document.getElementById('result-value');
+  <div id="toast"></div>
 
-    // Show image preview when a file is chosen
+  <script>
+    const fileInput      = document.getElementById('file-input');
+    const uploadZone     = document.getElementById('upload-zone');
+    const previewCont    = document.getElementById('preview-container');
+    const previewImg     = document.getElementById('preview-img');
+    const scanBtn        = document.getElementById('scan-btn');
+    const scanLabel      = document.getElementById('scan-label');
+    const scanLoader     = document.getElementById('scan-loader');
+    const resultBox      = document.getElementById('result-box');
+    const resultFoodName = document.getElementById('result-food-name');
+    const resultConf     = document.getElementById('result-confidence');
+    const manualForm     = document.getElementById('manual-form');
+    const manualDivider  = document.getElementById('manual-divider');
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('input-date-added').value = today;
+
+    // File input change
     fileInput.addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function (e) {
         previewImg.src = e.target.result;
-        previewImg.style.display = 'block';
+        previewCont.style.display = 'block';
         scanBtn.disabled = false;
         resultBox.style.display = 'none';
+        manualForm.style.display = 'none';
+        manualDivider.style.display = 'none';
       };
       reader.readAsDataURL(file);
     });
 
-    // Drag and drop support
+    // Drag and drop
     uploadZone.addEventListener('dragover', e => {
       e.preventDefault();
-      uploadZone.style.borderColor = 'var(--green)';
+      uploadZone.classList.add('dragover');
     });
-
-    uploadZone.addEventListener('dragleave', () => {
-      uploadZone.style.borderColor = 'var(--border)';
-    });
-
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
     uploadZone.addEventListener('drop', e => {
       e.preventDefault();
-      uploadZone.style.borderColor = 'var(--border)';
+      uploadZone.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
       if (file && file.type.startsWith('image/')) {
         fileInput.files = e.dataTransfer.files;
@@ -92,27 +426,81 @@
       }
     });
 
-    // Scan function — in Week 2 this will call the Flask API
+    // Step progress
+    function setStep(n) {
+      for (let i = 1; i <= 3; i++) {
+        const step = document.getElementById('step' + i);
+        step.classList.remove('active', 'done');
+        if (i < n)  step.classList.add('done');
+        if (i === n) step.classList.add('active');
+      }
+      for (let i = 1; i <= 2; i++) {
+        const line = document.getElementById('line' + i);
+        line.classList.toggle('done', i < n);
+      }
+    }
+
+    // Scan food
     function scanFood() {
       scanBtn.disabled = true;
-      scanBtn.textContent = 'Scanning...';
+      scanLabel.style.display = 'none';
+      scanLoader.style.display = 'block';
       resultBox.style.display = 'none';
+      manualForm.style.display = 'none';
+      manualDivider.style.display = 'none';
+      setStep(2);
 
-      // TODO (Week 2): Replace this with a real API call to Flask
-      // Example:
+      // TODO (connect to Flask API in next step):
       // const formData = new FormData();
       // formData.append('image', fileInput.files[0]);
-      // const response = await fetch('/api/detect', { method: 'POST', body: formData });
-      // const data = await response.json();
-      // resultValue.textContent = data.food_name;
+      // const res = await fetch('http://localhost:5000/api/detect', { method:'POST', body: formData });
+      // const data = await res.json();
+      // showResult(data.food_name, data.confidence);
 
-      // Placeholder simulation for Week 1
+      // Placeholder simulation for now
       setTimeout(() => {
-        resultValue.textContent = 'Detected: Apple 🍎 (placeholder)';
-        resultBox.style.display = 'block';
+        scanLabel.style.display = 'inline';
+        scanLoader.style.display = 'none';
         scanBtn.disabled = false;
-        scanBtn.textContent = 'Scan Food';
-      }, 1500);
+        showResult('Apple', 94);
+        setStep(3);
+      }, 2000);
+    }
+
+    function showResult(foodName, confidence) {
+      resultFoodName.textContent = foodName;
+      resultConf.textContent = 'Confidence: ' + confidence + '%';
+      resultBox.style.display = 'block';
+      manualDivider.style.display = 'block';
+      manualForm.style.display = 'block';
+      document.getElementById('input-food-name').value = foodName;
+      // Set default expiry 7 days from today
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + 7);
+      document.getElementById('input-expiry-date').value = expiry.toISOString().split('T')[0];
+    }
+
+    function saveFood() {
+      const name   = document.getElementById('input-food-name').value.trim();
+      const added  = document.getElementById('input-date-added').value;
+      const expiry = document.getElementById('input-expiry-date').value;
+
+      if (!name || !added || !expiry) {
+        showToast('⚠️ Please fill in all fields!');
+        return;
+      }
+
+      // TODO (Week 3): Send to Firebase via Flask API
+      // For now, save to localStorage as placeholder
+      showToast('✅ ' + name + ' saved to dashboard!');
+      setTimeout(() => window.location.href = 'index.html', 1500);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
   </script>
 
