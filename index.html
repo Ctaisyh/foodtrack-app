@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FoodTrack – Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🥦 Food<span>Track</span></div>
+    <a href="add_food.html" class="nav-btn">+ Add Food</a>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Your Food Inventory</h1>
+      <p>Track expiry dates and reduce food waste</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="sum-card green">
+        <div class="label">Fresh Items</div>
+        <div class="value" id="count-fresh">0</div>
+      </div>
+      <div class="sum-card yellow">
+        <div class="label">Expiring Soon</div>
+        <div class="value" id="count-soon">0</div>
+      </div>
+      <div class="sum-card red">
+        <div class="label">Expired</div>
+        <div class="value" id="count-expired">0</div>
+      </div>
+    </div>
+
+    <!-- Food Table -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Food Name</th>
+            <th>Date Added</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="food-table-body">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+
+      <!-- Empty state shown when no items -->
+      <div class="empty-state" id="empty-state">
+        <div style="font-size: 2.5rem;">🥗</div>
+        <p>No food items yet. <a href="add_food.html" style="color: var(--green); font-weight: 600;">Add your first item →</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Sample data — in Week 2/3 this will come from Flask + Firebase
+    const foodItems = [
+      { name: "Apple",   dateAdded: "2025-03-12", expiryDate: "2025-03-20" },
+      { name: "Milk",    dateAdded: "2025-03-10", expiryDate: "2025-03-14" },
+      { name: "Bread",   dateAdded: "2025-03-05", expiryDate: "2025-03-11" },
+      { name: "Banana",  dateAdded: "2025-03-13", expiryDate: "2025-03-18" },
+      { name: "Yogurt",  dateAdded: "2025-03-08", expiryDate: "2025-03-13" },
+    ];
+
+    function getStatus(expiryDateStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiry = new Date(expiryDateStr);
+      const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0)  return { label: "Expired",       cls: "expired" };
+      if (diffDays <= 3) return { label: "Expiring Soon", cls: "soon"    };
+      return               { label: "Fresh",          cls: "fresh"   };
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('food-table-body');
+      const emptyState = document.getElementById('empty-state');
+
+      let fresh = 0, soon = 0, expired = 0;
+
+      if (foodItems.length === 0) {
+        emptyState.style.display = 'block';
+        tbody.innerHTML = '';
+      } else {
+        emptyState.style.display = 'none';
+        tbody.innerHTML = foodItems.map(item => {
+          const status = getStatus(item.expiryDate);
+          if (status.cls === 'fresh')   fresh++;
+          if (status.cls === 'soon')    soon++;
+          if (status.cls === 'expired') expired++;
+
+          return `
+            <tr>
+              <td><strong>${item.name}</strong></td>
+              <td>${formatDate(item.dateAdded)}</td>
+              <td>${formatDate(item.expiryDate)}</td>
+              <td><span class="badge ${status.cls}">${status.label}</span></td>
+            </tr>`;
+        }).join('');
+      }
+
+      // Update summary cards
+      document.getElementById('count-fresh').textContent   = fresh;
+      document.getElementById('count-soon').textContent    = soon;
+      document.getElementById('count-expired').textContent = expired;
+    }
+
+    renderTable();
+  </script>
+
+</body>
+</html>

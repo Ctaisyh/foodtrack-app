@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FoodTrack – Add Food</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🥦 Food<span>Track</span></div>
+    <a href="index.html" class="nav-btn">← Dashboard</a>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="add-food-wrapper">
+
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="page-header">
+      <h1>Scan Your Food</h1>
+      <p>Upload a photo and our AI will detect what it is</p>
+    </div>
+
+    <div class="form-card">
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📷</div>
+        <p><strong>Click to upload</strong> a food image</p>
+        <p>or drag and drop here</p>
+        <img id="preview-img" src="" alt="Preview" />
+      </div>
+      <input type="file" id="file-input" accept="image/*" />
+
+      <!-- Result Box (shown after detection) -->
+      <div id="result-box">
+        <div class="result-label">Detected Food</div>
+        <div class="result-value" id="result-value">Apple 🍎</div>
+      </div>
+
+      <!-- Scan Button -->
+      <button class="btn-scan" id="scan-btn" disabled onclick="scanFood()">
+        Scan Food
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    const fileInput   = document.getElementById('file-input');
+    const uploadZone  = document.getElementById('upload-zone');
+    const previewImg  = document.getElementById('preview-img');
+    const scanBtn     = document.getElementById('scan-btn');
+    const resultBox   = document.getElementById('result-box');
+    const resultValue = document.getElementById('result-value');
+
+    // Show image preview when a file is chosen
+    fileInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block';
+        scanBtn.disabled = false;
+        resultBox.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Drag and drop support
+    uploadZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'var(--green)';
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.style.borderColor = 'var(--border)';
+    });
+
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'var(--border)';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // Scan function — in Week 2 this will call the Flask API
+    function scanFood() {
+      scanBtn.disabled = true;
+      scanBtn.textContent = 'Scanning...';
+      resultBox.style.display = 'none';
+
+      // TODO (Week 2): Replace this with a real API call to Flask
+      // Example:
+      // const formData = new FormData();
+      // formData.append('image', fileInput.files[0]);
+      // const response = await fetch('/api/detect', { method: 'POST', body: formData });
+      // const data = await response.json();
+      // resultValue.textContent = data.food_name;
+
+      // Placeholder simulation for Week 1
+      setTimeout(() => {
+        resultValue.textContent = 'Detected: Apple 🍎 (placeholder)';
+        resultBox.style.display = 'block';
+        scanBtn.disabled = false;
+        scanBtn.textContent = 'Scan Food';
+      }, 1500);
+    }
+  </script>
+
+</body>
+</html>
