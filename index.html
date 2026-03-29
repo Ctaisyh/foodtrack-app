@@ -3,135 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FoodTrack – Add Food</title>
+  <title>FoodTrack – Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .steps-bar { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:2rem; }
-    .step { display:flex; flex-direction:column; align-items:center; gap:6px; }
-    .step-circle { width:36px; height:36px; border-radius:50%; border:2px solid var(--border); background:var(--card); color:var(--muted); font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
-    .step.active .step-circle { background:var(--nav-bg); border-color:var(--nav-bg); color:#fff; }
-    .step.done .step-circle   { background:var(--green);  border-color:var(--green);  color:#fff; }
-    .step-label { font-size:0.72rem; color:var(--muted); white-space:nowrap; }
-    .step.active .step-label { color:var(--nav-bg); font-weight:600; }
-    .step.done .step-label   { color:var(--green); }
-    .step-line { flex:1; height:2px; background:var(--border); margin:0 8px; margin-bottom:22px; transition:background 0.3s; min-width:40px; }
-    .step-line.done { background:var(--green); }
-    .upload-zone { border:2px dashed var(--border); border-radius:var(--radius); padding:2.5rem 1rem; text-align:center; cursor:pointer; transition:all 0.2s; background:#fafbfa; position:relative; }
-    .upload-zone:hover, .upload-zone.dragover { border-color:var(--green); background:var(--green-light); }
-    .upload-zone .icon { font-size:2.5rem; margin-bottom:10px; }
-    .upload-zone p { color:var(--muted); font-size:0.9rem; }
-    .upload-zone p strong { color:var(--green); }
-    .upload-zone .file-types { font-size:0.75rem; color:var(--muted); margin-top:6px; opacity:0.7; }
-    #file-input { display:none; }
-    #preview-container { display:none; margin-top:14px; position:relative; }
-    #preview-img { width:100%; max-height:220px; object-fit:cover; border-radius:8px; border:1px solid var(--border); }
-    .preview-change { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.55); color:#fff; border:none; padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; }
-    .btn-scan { width:100%; background:var(--nav-bg); color:#fff; border:none; padding:14px; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:background 0.2s; margin-top:1rem; display:flex; align-items:center; justify-content:center; gap:8px; }
-    .btn-scan:hover    { background:#253d2a; }
-    .btn-scan:disabled { background:#b0b8ad; cursor:not-allowed; }
-    .scan-loader { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-    #result-box { display:none; margin-top:1.2rem; border-radius:var(--radius); overflow:hidden; animation:fadeUp 0.4s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-    .result-header { background:var(--green); color:#fff; padding:10px 16px; font-size:0.82rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
-    .result-body { background:var(--green-light); border:1px solid #a8dfc5; border-top:none; padding:1rem 1.2rem; }
-    .result-food-name { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; color:#0e7a50; }
-    .result-confidence { font-size:0.8rem; color:var(--green); margin-top:2px; }
-    #manual-form { display:none; margin-top:1.2rem; animation:fadeUp 0.4s ease; }
-    .form-group { margin-bottom:1rem; }
-    .form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
-    .form-group input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.9rem; color:var(--text); background:var(--card); outline:none; transition:border-color 0.2s; }
-    .form-group input:focus { border-color:var(--green); }
-    .btn-save { width:100%; background:var(--green); color:#fff; border:none; padding:14px; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:background 0.2s; margin-top:0.5rem; display:flex; align-items:center; justify-content:center; gap:8px; }
-    .btn-save:hover    { background:#0e7a50; }
-    .btn-save:disabled { background:#b0b8ad; cursor:not-allowed; }
+    .search-bar { display:flex; align-items:center; gap:10px; margin-bottom:1.5rem; }
+    .search-bar input { flex:1; padding:10px 16px; border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.9rem; background:var(--card); color:var(--text); outline:none; transition:border-color 0.2s; }
+    .search-bar input:focus { border-color:var(--green); }
+    .filter-btn { padding:10px 16px; border:1px solid var(--border); border-radius:8px; background:var(--card); font-family:'DM Sans',sans-serif; font-size:0.85rem; cursor:pointer; color:var(--muted); transition:all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background:var(--nav-bg); color:#fff; border-color:var(--nav-bg); }
+    .filter-btn.green.active  { background:var(--green);  border-color:var(--green);  color:#fff; }
+    .filter-btn.yellow.active { background:var(--yellow); border-color:var(--yellow); color:#fff; }
+    .filter-btn.red.active    { background:var(--red);    border-color:var(--red);    color:#fff; }
+    .sum-card { animation:fadeUp 0.4s ease both; }
+    .sum-card:nth-child(1) { animation-delay:0.1s; }
+    .sum-card:nth-child(2) { animation-delay:0.2s; }
+    .sum-card:nth-child(3) { animation-delay:0.3s; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .progress-section { background:var(--card); border-radius:var(--radius); border:1px solid var(--border); padding:1.2rem 1.4rem; margin-bottom:2rem; box-shadow:var(--shadow); }
+    .progress-label { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--muted); margin-bottom:8px; }
+    .progress-bar-bg { height:8px; background:var(--bg); border-radius:10px; overflow:hidden; display:flex; gap:2px; }
+    .progress-fill { height:100%; border-radius:10px; transition:width 0.6s ease; }
+    .progress-fill.green  { background:var(--green); }
+    .progress-fill.yellow { background:var(--yellow); }
+    .progress-fill.red    { background:var(--red); }
+    tbody tr { animation:fadeIn 0.3s ease both; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .btn-delete { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:4px 8px; border-radius:6px; transition:all 0.2s; }
+    .btn-delete:hover { background:var(--red-light); color:var(--red); }
+    .days-left { font-size:0.78rem; color:var(--muted); }
     #toast { position:fixed; bottom:24px; right:24px; background:var(--nav-bg); color:#fff; padding:12px 20px; border-radius:10px; font-size:0.88rem; opacity:0; transform:translateY(10px); transition:all 0.3s ease; z-index:999; pointer-events:none; }
     #toast.show { opacity:1; transform:translateY(0); }
-    .divider { text-align:center; color:var(--muted); font-size:0.8rem; margin:1rem 0; position:relative; }
-    .divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
-    .divider::before { left:0; }
-    .divider::after  { right:0; }
-    .save-loader { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+    .no-results { text-align:center; padding:2rem; color:var(--muted); font-size:0.9rem; }
+    .loading-state { text-align:center; padding:3rem; color:var(--muted); font-size:0.9rem; }
+    .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
   </style>
 </head>
 <body>
 
   <nav>
     <div class="logo">🥦 Food<span>Track</span></div>
-    <a href="index.html" class="nav-btn">← Dashboard</a>
+    <a href="add_food.html" class="nav-btn">+ Add Food</a>
   </nav>
 
-  <div class="add-food-wrapper">
-    <a href="index.html" class="back-link">← Back to Dashboard</a>
-
-    <div class="steps-bar">
-      <div class="step active" id="step1">
-        <div class="step-circle">1</div>
-        <div class="step-label">Upload Image</div>
-      </div>
-      <div class="step-line" id="line1"></div>
-      <div class="step" id="step2">
-        <div class="step-circle">2</div>
-        <div class="step-label">AI Detection</div>
-      </div>
-      <div class="step-line" id="line2"></div>
-      <div class="step" id="step3">
-        <div class="step-circle">3</div>
-        <div class="step-label">Save Food</div>
-      </div>
-    </div>
-
+  <div class="page">
     <div class="page-header">
-      <h1>Scan Your Food</h1>
-      <p>Upload a photo and our AI will detect what it is</p>
+      <h1>Your Food Inventory</h1>
+      <p>Track expiry dates and reduce food waste</p>
     </div>
 
-    <div class="form-card">
-      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-        <div class="icon">📷</div>
-        <p><strong>Click to upload</strong> a food image</p>
-        <p>or drag and drop here</p>
-        <p class="file-types">Supports JPG, PNG, WEBP</p>
-        <div id="preview-container">
-          <img id="preview-img" src="" alt="Preview" />
-          <button class="preview-change" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Change</button>
-        </div>
+    <div class="summary-cards">
+      <div class="sum-card green"><div class="label">Fresh Items</div><div class="value" id="count-fresh">0</div></div>
+      <div class="sum-card yellow"><div class="label">Expiring Soon</div><div class="value" id="count-soon">0</div></div>
+      <div class="sum-card red"><div class="label">Expired</div><div class="value" id="count-expired">0</div></div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-label"><span>Food Health Overview</span><span id="progress-text">Loading...</span></div>
+      <div class="progress-bar-bg">
+        <div class="progress-fill green"  id="bar-fresh"   style="width:0%"></div>
+        <div class="progress-fill yellow" id="bar-soon"    style="width:0%"></div>
+        <div class="progress-fill red"    id="bar-expired" style="width:0%"></div>
       </div>
-      <input type="file" id="file-input" accept="image/*" />
+    </div>
 
-      <button class="btn-scan" id="scan-btn" disabled onclick="scanFood()">
-        <span id="scan-label">🔍 Scan Food</span>
-        <div class="scan-loader" id="scan-loader"></div>
-      </button>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="🔍  Search food items..." oninput="renderTable()" />
+      <button class="filter-btn active" id="filter-all"     onclick="setFilter('all')">All</button>
+      <button class="filter-btn green"  id="filter-fresh"   onclick="setFilter('fresh')">🟢 Fresh</button>
+      <button class="filter-btn yellow" id="filter-soon"    onclick="setFilter('soon')">🟡 Soon</button>
+      <button class="filter-btn red"    id="filter-expired" onclick="setFilter('expired')">🔴 Expired</button>
+    </div>
 
-      <div id="result-box">
-        <div class="result-header">✅ Food Detected!</div>
-        <div class="result-body">
-          <div class="result-food-name" id="result-food-name">Apple</div>
-          <div class="result-confidence" id="result-confidence">Confidence: 94%</div>
-        </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Food Name</th><th>Date Added</th><th>Est. Expiry</th><th>Days Left</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="food-table-body">
+          <tr><td colspan="6">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              Loading food data from Firebase...
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <div style="font-size:2.5rem">🥗</div>
+        <p>No food items yet. <a href="add_food.html" style="color:var(--green);font-weight:600;">Add your first item →</a></p>
       </div>
-
-      <div class="divider" id="manual-divider" style="display:none">or edit manually</div>
-
-      <div id="manual-form">
-        <div class="form-group">
-          <label>Food Name</label>
-          <input type="text" id="input-food-name" placeholder="e.g. Apple" />
-        </div>
-        <div class="form-group">
-          <label>Date Added</label>
-          <input type="date" id="input-date-added" />
-        </div>
-        <div class="form-group">
-          <label>Estimated Expiry Date</label>
-          <input type="date" id="input-expiry-date" />
-        </div>
-        <button class="btn-save" id="save-btn" onclick="saveFood()">
-          <span id="save-label">💾 Save to Dashboard</span>
-          <div class="save-loader" id="save-loader"></div>
-        </button>
-      </div>
+      <div class="no-results" id="no-results" style="display:none;">No items match your search or filter.</div>
     </div>
   </div>
 
@@ -141,7 +105,7 @@
   <script type="module">
     import { initializeApp }
       from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, addDoc }
+    import { getFirestore, collection, getDocs, deleteDoc, doc }
       from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     // ✅ FIREBASE CONFIG (T3)
@@ -160,153 +124,73 @@
     // ✅ EXACT FIELD NAMES FROM T3
     const COLLECTION = "food_id";
 
-    // =============================================
-    // UI ELEMENTS
-    // =============================================
-    const fileInput      = document.getElementById('file-input');
-    const uploadZone     = document.getElementById('upload-zone');
-    const previewCont    = document.getElementById('preview-container');
-    const previewImg     = document.getElementById('preview-img');
-    const scanBtn        = document.getElementById('scan-btn');
-    const scanLabel      = document.getElementById('scan-label');
-    const scanLoader     = document.getElementById('scan-loader');
-    const resultBox      = document.getElementById('result-box');
-    const resultFoodName = document.getElementById('result-food-name');
-    const resultConf     = document.getElementById('result-confidence');
-    const manualForm     = document.getElementById('manual-form');
-    const manualDivider  = document.getElementById('manual-divider');
-    const saveBtn        = document.getElementById('save-btn');
-    const saveLabel      = document.getElementById('save-label');
-    const saveLoader     = document.getElementById('save-loader');
-
-    // Set today's date as default
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('input-date-added').value = today;
+    let foodItems     = [];
+    let currentFilter = 'all';
 
     // =============================================
-    // FILE UPLOAD
+    // LOAD DATA FROM FIREBASE
     // =============================================
-    fileInput.addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        previewCont.style.display = 'block';
-        scanBtn.disabled = false;
-        resultBox.style.display = 'none';
-        manualForm.style.display = 'none';
-        manualDivider.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Drag and drop
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault();
-      uploadZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        fileInput.files = e.dataTransfer.files;
-        fileInput.dispatchEvent(new Event('change'));
-      }
-    });
-
-    // =============================================
-    // STEP PROGRESS
-    // =============================================
-    function setStep(n) {
-      for (let i = 1; i <= 3; i++) {
-        const step = document.getElementById('step' + i);
-        step.classList.remove('active', 'done');
-        if (i < n)  step.classList.add('done');
-        if (i === n) step.classList.add('active');
-      }
-      for (let i = 1; i <= 2; i++) {
-        document.getElementById('line' + i).classList.toggle('done', i < n);
+    async function loadFromFirebase() {
+      try {
+        const snapshot = await getDocs(collection(db, COLLECTION));
+        foodItems = snapshot.docs.map(docSnap => {
+          const d = docSnap.data();
+          return {
+            id:         docSnap.id,
+            name:       d.food_name        || "Unknown",
+            dateAdded:  d.date_added       || "",
+            expiryDate: d.estimated_expiry || d.expiry_date || ""
+          };
+        });
+        renderTable();
+      } catch (err) {
+        console.error("Firebase error:", err);
+        document.getElementById('food-table-body').innerHTML =
+          `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--red);">
+            ⚠️ Could not load data. Check Firebase connection.
+          </td></tr>`;
       }
     }
 
     // =============================================
-    // SCAN FOOD (placeholder — T2 connects here)
+    // DELETE FROM FIREBASE
     // =============================================
-    window.scanFood = function() {
-      scanBtn.disabled = true;
-      scanLabel.style.display = 'none';
-      scanLoader.style.display = 'block';
-      resultBox.style.display = 'none';
-      manualForm.style.display = 'none';
-      manualDivider.style.display = 'none';
-      setStep(2);
-
-      // ⬇️ TODO: Replace with Flask API when T2 is ready
-      // const formData = new FormData();
-      // formData.append('image', fileInput.files[0]);
-      // const res = await fetch('http://127.0.0.1:5000/detect', { method:'POST', body: formData });
-      // const data = await res.json();
-      // showResult(data.food_name, data.confidence);
-
-      // Placeholder simulation
-      setTimeout(() => {
-        scanLabel.style.display = 'inline';
-        scanLoader.style.display = 'none';
-        scanBtn.disabled = false;
-        showResult('Apple', 94);
-        setStep(3);
-      }, 2000);
+    window.deleteItem = async function(id) {
+      try {
+        await deleteDoc(doc(db, COLLECTION, id));
+        foodItems = foodItems.filter(item => item.id !== id);
+        renderTable();
+        showToast('Item removed 🗑️');
+      } catch (err) {
+        showToast('⚠️ Could not delete item');
+      }
     };
 
-    function showResult(foodName, confidence) {
-      resultFoodName.textContent = foodName;
-      resultConf.textContent = 'Confidence: ' + confidence + '%';
-      resultBox.style.display = 'block';
-      manualDivider.style.display = 'block';
-      manualForm.style.display = 'block';
-      document.getElementById('input-food-name').value = foodName;
-      const expiry = new Date();
-      expiry.setDate(expiry.getDate() + 7);
-      document.getElementById('input-expiry-date').value = expiry.toISOString().split('T')[0];
+    // =============================================
+    // HELPERS
+    // =============================================
+    function getStatus(expiryDateStr) {
+      if (!expiryDateStr) return { label:"No Expiry", cls:"soon", days:0 };
+      const today = new Date(); today.setHours(0,0,0,0);
+      const expiry = new Date(expiryDateStr);
+      const diffDays = Math.ceil((expiry - today) / (1000*60*60*24));
+      if (diffDays < 0)  return { label:"Expired",       cls:"expired", days:diffDays };
+      if (diffDays <= 3) return { label:"Expiring Soon", cls:"soon",    days:diffDays };
+      return                    { label:"Fresh",         cls:"fresh",   days:diffDays };
     }
 
-    // =============================================
-    // ✅ SAVE TO FIREBASE (T3 field names)
-    // =============================================
-    window.saveFood = async function() {
-      const name   = document.getElementById('input-food-name').value.trim();
-      const added  = document.getElementById('input-date-added').value;
-      const expiry = document.getElementById('input-expiry-date').value;
+    function formatDate(dateStr) {
+      if (!dateStr) return "N/A";
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
 
-      if (!name || !added || !expiry) {
-        showToast('⚠️ Please fill in all fields!');
-        return;
-      }
-
-      // Show saving spinner
-      saveBtn.disabled = true;
-      saveLabel.style.display = 'none';
-      saveLoader.style.display = 'block';
-
-      try {
-        // ✅ Save to Firebase using T3's exact field names
-        await addDoc(collection(db, COLLECTION), {
-          food_name:         name,
-          date_added:        added,
-          estimated_expiry:  expiry,
-          expiry_date:       null
-        });
-
-        showToast('✅ ' + name + ' saved to dashboard!');
-        setTimeout(() => window.location.href = 'index.html', 1500);
-
-      } catch (err) {
-        console.error('Firebase save error:', err);
-        showToast('⚠️ Could not save. Check Firebase connection.');
-        saveBtn.disabled = false;
-        saveLabel.style.display = 'inline';
-        saveLoader.style.display = 'none';
-      }
+    window.setFilter = function(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('filter-' + filter).classList.add('active');
+      renderTable();
     };
 
     function showToast(msg) {
@@ -315,6 +199,75 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
+
+    // =============================================
+    // RENDER TABLE
+    // =============================================
+    function renderTable() {
+      const tbody      = document.getElementById('food-table-body');
+      const emptyState = document.getElementById('empty-state');
+      const noResults  = document.getElementById('no-results');
+      const searchVal  = document.getElementById('search-input').value.toLowerCase();
+
+      let fresh = 0, soon = 0, expired = 0;
+      foodItems.forEach(item => {
+        const s = getStatus(item.expiryDate);
+        if (s.cls==='fresh')   fresh++;
+        if (s.cls==='soon')    soon++;
+        if (s.cls==='expired') expired++;
+      });
+
+      document.getElementById('count-fresh').textContent   = fresh;
+      document.getElementById('count-soon').textContent    = soon;
+      document.getElementById('count-expired').textContent = expired;
+
+      const total = foodItems.length || 1;
+      document.getElementById('bar-fresh').style.width   = (fresh/total*100)+'%';
+      document.getElementById('bar-soon').style.width    = (soon/total*100)+'%';
+      document.getElementById('bar-expired').style.width = (expired/total*100)+'%';
+      document.getElementById('progress-text').textContent = foodItems.length + ' items total';
+
+      const filtered = foodItems.filter(item => {
+        const status = getStatus(item.expiryDate);
+        const matchFilter = currentFilter === 'all' || status.cls === currentFilter;
+        const matchSearch = item.name.toLowerCase().includes(searchVal);
+        return matchFilter && matchSearch;
+      });
+
+      if (foodItems.length === 0) {
+        emptyState.style.display = 'block';
+        noResults.style.display  = 'none';
+        tbody.innerHTML = '';
+        return;
+      } else { emptyState.style.display = 'none'; }
+
+      if (filtered.length === 0) {
+        noResults.style.display = 'block';
+        tbody.innerHTML = '';
+        return;
+      } else { noResults.style.display = 'none'; }
+
+      tbody.innerHTML = filtered.map((item, i) => {
+        const status = getStatus(item.expiryDate);
+        const daysText = status.days < 0
+          ? Math.abs(status.days)+' days ago'
+          : status.days === 0 ? 'Today!'
+          : status.days+' days';
+        return `<tr style="animation-delay:${i*0.05}s">
+          <td><strong>${item.name}</strong></td>
+          <td>${formatDate(item.dateAdded)}</td>
+          <td>${formatDate(item.expiryDate)}</td>
+          <td><span class="days-left">${daysText}</span></td>
+          <td><span class="badge ${status.cls}">${status.label}</span></td>
+          <td><button class="btn-delete" onclick="deleteItem('${item.id}')" title="Remove">🗑</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.renderTable = renderTable;
+
+    // ✅ START — Load data when page opens
+    loadFromFirebase();
   </script>
 
 </body>
